@@ -1,55 +1,24 @@
 plugins {
-    id 'net.neoforged.gradle' version '6.0' apply false
-    id 'eclipse'
-    id 'idea'
-    id 'maven-publish'
+    id 'net.neoforged.moddev' version '2.0'
 }
 
-version = '1.1.0'
-group = 'com.danjb.omnichunk'
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-minecraft {
+neoForge {
+    version = '21.1.289'
+    
     runs {
-        client {
-            workingDirectory = file('run')
-            property 'forge.logging.console.level', 'debug'
-            mods.src = file('src/main/java')
-            client = true
-        }
-        server {
-            workingDirectory = file('run')
-            property 'forge.logging.console.level', 'debug'
-            mods.src = file('src/main/java')
+        client { client() }
+        server { server() }
+    }
+    
+    mods {
+        omnichunk {
+            sourceSet sourceSets.main
         }
     }
-}
-
-repositories {
-    maven { url 'https://maven.neoforged.net/releases' }
-}
-
-dependencies {
-    minecraft 'net.neoforged:neoforge:1.20.4'
-    annotationProcessor 'net.neoforged:neoforge:1.20.4'
-}
-
-jar {
-    manifest {
-        attributes([
-            'Specification-Title': 'omnichunk',
-            'Specification-Vendor': 'danjb',
-            'Specification-Version': '1',
-            'Implementation-Title': project.main_class,
-            'Implementation-Vendor': 'danjb',
-            'Implementation-Version': project.jar.archiveVersion
-        ])
-    }
-}
-
-jar.finalizedBy('reobfJar')
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
 }
