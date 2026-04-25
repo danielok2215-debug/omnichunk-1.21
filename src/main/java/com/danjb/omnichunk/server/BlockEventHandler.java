@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 
 public class BlockEventHandler {
     private static final Logger LOGGER = LogManager.getLogger();
+    private static boolean isSyncing = false;
     
     private final ChunkTracker chunkTracker;
 
@@ -21,13 +22,52 @@ public class BlockEventHandler {
     public void onBlockPlaced(BlockEvent.EntityPlaceEvent event) {
         if (event.isCanceled()) return;
         if (event.getLevel().isClientSide()) return;
+        if (isSyncing) return;
         
-        BlockPos pos = event.getPos();
-        BlockState placedBlock = event.getPlacedBlock();
-        ServerLevel level = (ServerLevel) event.getLevel();
+        isSyncing = true;
         
-        MasterChunk masterChunk = MasterChunk.getFor(level);
+        try {
+            BlockPos pos = event.getPos();
+            BlockState placedBlock = event.getPlacedBlock();
+            ServerLevel level = (ServerLevel) event.getLevel();
+            
+            MasterChunk masterChunk = MasterChunk.getFor(level);
+            
+            if (masterChunk != null) {
+                int localX = pos.getX() & 15;
+                int localZ = pos.getZ() & 15;
+                int y = pos.getY();
+                
+                masterChunk.syncBlockToAllChunks(level, localX, y, localZ, placedBlock);
+            }
+        } finally {
+            isSyncing = false;
+        }
+    }
+
+    @SubscribeEvent
+    public void onBlockBroken(BlockEvent.BreakEvent event) {
+        if (event.isCanceled()) return;
+        if (event.getLevel().isClientSide()) return;
+        if (isSyncing) return;
         
-        if (masterChunk != null) {
-            BlockPos chunkStart = new BlockPos(
-                (pos.getX() >> 4)
+        isSyncing = true;
+        
+        try {
+            BlockPos pos = event.getPos();
+            ServerLevel level = (ServerLevel) event.getLevel();
+            
+            MasterChunk masterChunk = MasterChunk.getFor(level);
+            
+            if (masterChunk != null) {
+                int localX = pos.getX() & 15;
+                int localZ = pos.getZ() & 15;
+                int y = pos.getY();
+                
+                masterChunk.removeBlockFromAllChunks(level, localX, y, localZ);
+            }
+        } finally {
+            isSyncing = false;
+        }
+    }
+}
