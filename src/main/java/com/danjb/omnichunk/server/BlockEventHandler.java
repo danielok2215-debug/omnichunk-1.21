@@ -30,4 +30,4 @@ public class BlockEventHandler {
         
         if (masterChunk != null) {
             BlockPos chunkStart = new BlockPos(
-                (pos.getX() >>
+                (pos.getX() >> 4)
