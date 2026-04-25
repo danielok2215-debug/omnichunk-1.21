@@ -15,3 +15,5 @@ import java.util.Set;
 
 public class ChunkTracker {
     private static final Logger LOGGER = LogManager.getLogger();
+    
+    private final Map
