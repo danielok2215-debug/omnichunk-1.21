@@ -1,0 +1,58 @@
+plugins {
+    id 'net.neoforged.gradle' version '[PRERELEASE]'
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+}
+
+version = '1.1.0'
+group = 'com.danjb.omnichunk'
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+minecraft {
+    accessTransformers.set(file('src/main/resources/META-INF/accesstransformer.cfg'))
+    
+    runs {
+        client {
+            workingDirectory = file('run')
+            property 'forge.logging.console.level', 'debug'
+            modSource project.sourceSets.main
+            client = true
+        }
+        server {
+            workingDirectory = file('run')
+            property 'forge.logging.console.level', 'debug'
+            modSource project.sourceSets.main
+        }
+    }
+}
+
+repositories {
+    maven { url = 'https://maven.neoforged.net/releases' }
+    maven { url = 'https://maven.neoforged.net/prerelease' }
+}
+
+dependencies {
+    minecraft 'net.neoforged:neoforge:1.21.3'
+    annotationProcessor 'net.neoforged:neoforge:1.21.3'
+}
+
+jar {
+    manifest {
+        attributes([
+            'Specification-Title': 'omnichunk',
+            'Specification-Vendor': 'danjb',
+            'Specification-Version': '1',
+            'Implementation-Title': project.main_class,
+            'Implementation-Vendor': 'danjb',
+            'Implementation-Version': project.jar.archiveVersion
+        ])
+    }
+}
+
+jar.finalizedBy('reobfJar')
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
