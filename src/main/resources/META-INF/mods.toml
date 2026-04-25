@@ -1,0 +1,10 @@
+modLoader="javafml"
+loaderVersion="[0,)"
+license="All Rights Reserved"
+
+[[mods]]
+modId="omnichunk"
+version="1.1.0"
+displayName="Omnichunk"
+authors="Quillbee"
+description="Any change to one chunk affects ALL chunks!"
